@@ -4,11 +4,16 @@ import '../data/products.dart';
 import '../widgets/product_card.dart';
 import 'product_detail_page.dart';
 
-/// 列表分页模拟（ListView.builder + 上拉加载）
+/// 商品列表页：分页模拟（builder + 上拉加载）
+///
+/// 分类由路由 arguments 传入；离开本页时把详情页回传的结果带回分类首页。
 class ProductListPage extends StatefulWidget {
-  const ProductListPage({super.key});
+  const ProductListPage({super.key, required this.category});
 
   static const String routeName = '/products';
+
+  /// 当前分类，由分类首页通过命名路由参数传入
+  final String category;
 
   @override
   State<ProductListPage> createState() => _ProductListPageState();
@@ -49,7 +54,7 @@ class _ProductListPageState extends State<ProductListPage> {
 
     setState(() => _isLoading = true);
 
-    final newItems = await MockApi.fetchProducts(_page);
+    final newItems = await MockApi.fetchProducts(_page, widget.category);
     if (!mounted) return;
 
     setState(() {
@@ -71,16 +76,32 @@ class _ProductListPageState extends State<ProductListPage> {
     await _loadMore();
   }
 
+  /// 进入详情页，并接收详情页回传的结果
+  Future<void> _openDetail(Product product) async {
+    final result = await Navigator.pushNamed(
+      context,
+      ProductDetailPage.routeName,
+      arguments: product,
+    );
+    if (result is String && mounted) {
+      setState(() => _lastActionResult = result);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // 返回分类首页时，把详情页回传的结果继续带回
+        leading: BackButton(
+          onPressed: () => Navigator.pop(context, _lastActionResult),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('商品列表（分页模拟）'),
+            Text(widget.category),
             Text(
               _lastActionResult ?? '点击商品查看详情',
               style: Theme.of(context).textTheme.bodySmall,
@@ -107,18 +128,6 @@ class _ProductListPageState extends State<ProductListPage> {
         ),
       ),
     );
-  }
-
-  /// 进入详情页，并接收详情页回传的结果
-  Future<void> _openDetail(Product product) async {
-    final result = await Navigator.pushNamed(
-      context,
-      ProductDetailPage.routeName,
-      arguments: product,
-    );
-    if (result is String && mounted) {
-      setState(() => _lastActionResult = result);
-    }
   }
 
   /// 底部加载状态：加载中 / 没有更多

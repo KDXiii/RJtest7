@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'data/products.dart';
 import 'pages/book_detail_page.dart';
 import 'pages/book_list_page.dart';
 import 'pages/home_page.dart';
 import 'pages/product_detail_page.dart';
+import 'pages/product_home_page.dart';
 import 'pages/product_list_page.dart';
 
 void main() {
@@ -25,7 +27,15 @@ class MyApp extends StatelessWidget {
         HomePage.routeName: (context) => const HomePage(),
         BookListPage.routeName: (context) => const BookListPage(),
         BookDetailPage.routeName: (context) => const BookDetailPage(),
-        ProductListPage.routeName: (context) => const ProductListPage(),
+        ProductHomePage.routeName: (context) => const ProductHomePage(),
+        ProductListPage.routeName: (context) {
+          final arguments = ModalRoute.of(context)?.settings.arguments;
+          return ProductListPage(
+            category: arguments is String
+                ? arguments
+                : MockApi.categories.first,
+          );
+        },
         ProductDetailPage.routeName: (context) => const ProductDetailPage(),
       },
     );
