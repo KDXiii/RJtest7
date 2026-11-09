@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'pages/book_detail_page.dart';
 import 'pages/book_list_page.dart';
 import 'pages/home_page.dart';
+import 'pages/product_detail_page.dart';
 import 'pages/product_list_page.dart';
 
 void main() {
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         BookListPage.routeName: (context) => const BookListPage(),
         BookDetailPage.routeName: (context) => const BookDetailPage(),
         ProductListPage.routeName: (context) => const ProductListPage(),
+        ProductDetailPage.routeName: (context) => const ProductDetailPage(),
       },
     );
   }

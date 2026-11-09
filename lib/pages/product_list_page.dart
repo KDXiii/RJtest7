@@ -1,37 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// 商品数据模型
-class Product {
-  const Product({required this.id, required this.name, required this.price});
-
-  final int id;
-  final String name;
-  final double price;
-}
-
-/// 模拟后端接口：分页返回商品数据
-class MockApi {
-  static const int pageSize = 20;
-  static const int totalCount = 57; // 模拟服务器总数据量
-
-  static Future<List<Product>> fetchProducts(int page) async {
-    // 模拟网络延迟
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final start = page * pageSize;
-    if (start >= totalCount) return <Product>[];
-
-    final end = (start + pageSize).clamp(0, totalCount);
-    return List.generate(
-      end - start,
-      (i) => Product(
-        id: start + i + 1,
-        name: '商品 ${start + i + 1}',
-        price: 9.9 + (start + i) % 100,
-      ),
-    );
-  }
-}
+import '../data/products.dart';
+import 'product_detail_page.dart';
 
 /// 列表分页模拟（ListView.builder + 上拉加载）
 class ProductListPage extends StatefulWidget {
@@ -46,6 +16,9 @@ class ProductListPage extends StatefulWidget {
 class _ProductListPageState extends State<ProductListPage> {
   final List<Product> _products = [];
   final ScrollController _scrollController = ScrollController();
+
+  /// 详情页返回时携带的结果
+  String? _lastActionResult;
 
   int _page = 0;
   bool _isLoading = false;
@@ -102,7 +75,17 @@ class _ProductListPageState extends State<ProductListPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('商品列表（分页模拟）'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('商品列表（分页模拟）'),
+            Text(
+              _lastActionResult ?? '点击商品查看详情',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,
@@ -128,12 +111,25 @@ class _ProductListPageState extends State<ProductListPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                onTap: () => _openDetail(product),
               ),
             );
           },
         ),
       ),
     );
+  }
+
+  /// 进入详情页，并接收详情页回传的结果
+  Future<void> _openDetail(Product product) async {
+    final result = await Navigator.pushNamed(
+      context,
+      ProductDetailPage.routeName,
+      arguments: product,
+    );
+    if (result is String && mounted) {
+      setState(() => _lastActionResult = result);
+    }
   }
 
   /// 底部加载状态：加载中 / 没有更多
