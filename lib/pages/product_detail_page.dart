@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/products.dart';
+import '../widgets/info_row.dart';
 
 /// 商品详情页
 ///
@@ -57,9 +58,9 @@ class _ProductDetailBody extends StatelessWidget {
           ),
         ),
         const Divider(height: 40),
-        _InfoRow(label: '商品编号', value: '${product.id}'),
+        InfoRow(label: '商品编号', value: '${product.id}'),
         const SizedBox(height: 12),
-        _InfoRow(label: '商品描述', value: '这是 ${product.name} 的描述信息'),
+        InfoRow(label: '商品描述', value: '这是 ${product.name} 的描述信息'),
         const SizedBox(height: 32),
         FilledButton.icon(
           onPressed: () => Navigator.pop(context, '已收藏：${product.name}'),
@@ -71,34 +72,6 @@ class _ProductDetailBody extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
           child: const Text('直接返回'),
         ),
-      ],
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 80,
-          child: Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.outline,
-            ),
-          ),
-        ),
-        Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
       ],
     );
   }

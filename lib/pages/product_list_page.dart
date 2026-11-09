@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/products.dart';
+import '../widgets/product_card.dart';
 import 'product_detail_page.dart';
 
 /// 列表分页模拟（ListView.builder + 上拉加载）
@@ -98,21 +99,9 @@ class _ProductListPageState extends State<ProductListPage> {
               return _buildFooter();
             }
             final product = _products[index];
-            return Card(
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: ListTile(
-                leading: CircleAvatar(child: Text('${product.id}')),
-                title: Text(product.name),
-                subtitle: Text('这是 ${product.name} 的描述信息'),
-                trailing: Text(
-                  '¥${product.price.toStringAsFixed(1)}',
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onTap: () => _openDetail(product),
-              ),
+            return ProductCard(
+              product: product,
+              onTap: () => _openDetail(product),
             );
           },
         ),
